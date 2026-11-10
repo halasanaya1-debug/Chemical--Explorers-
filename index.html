@@ -1,0 +1,358 @@
+<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style></head><body>
+<title>مختبر المركّبات</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@600;700&family=Tajawal:wght@500;700;800&display=swap">
+<style>
+/* Layout: full-screen smart-board game. Header with 4 stage tabs, scrolling stage area, footer with prev/next and progress dots. */
+:root{
+  --bg:#f1f6ef; --ink:#16301f; --green:#1f6b3a; --green-d:#134d29;
+  --mag:#c2185b; --sun:#ffe94d; --line:#c9d9c9; --paper:#ffffff; --note:#fff8c9;
+  --f-display:'Reem Kufi','Tajawal','Segoe UI',Tahoma,sans-serif;
+  --f-body:'Tajawal','Segoe UI',Tahoma,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html{font-size:clamp(17px,2.05vw,46px);height:100%}
+body{margin:0;height:100%;display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:.4rem;
+  background:var(--bg);color:var(--ink);font-family:var(--f-body);direction:rtl;
+  padding-block:.5rem;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+button{font-family:inherit}
+header{display:flex;flex-wrap:wrap;align-items:center;gap:.6rem 1.2rem}
+.brand{margin:0;font-family:var(--f-display);font-size:1.7rem;color:var(--green-d);line-height:1.1}
+.brand small{display:block;font-family:var(--f-body);font-size:.6em;font-weight:700;color:var(--mag)}
+.tabs{display:flex;flex-wrap:wrap;gap:.5rem;margin-inline-start:auto}
+.tab{font-size:1.15rem;font-weight:800;padding:.4rem 1.1rem;border-radius:.8rem;border:.16rem solid var(--green);background:var(--paper);color:var(--green-d);cursor:pointer}
+.tab[aria-current="true"]{background:var(--green);color:#fff}
+.stars{font-size:1.15rem;font-weight:800;background:var(--sun);border-radius:2rem;padding:.3rem 1rem;color:#4a3b00}
+main{overflow:auto;min-height:0;padding:.3rem .1rem;display:grid;gap:1rem;align-content:start;animation:in .35s ease both}
+.page{display:grid;gap:1rem;animation:in .35s ease both}
+@keyframes in{from{opacity:0;transform:translateY(.6rem)}to{opacity:1;transform:none}}
+h2{font-family:var(--f-display);font-size:2rem;margin:0;color:var(--green-d);text-wrap:balance}
+.txt{font-size:1.3rem;line-height:1.75;margin:0}
+.hl{background:var(--sun);padding:0 .3em;border-radius:.25em;font-weight:800}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:1.1rem;align-items:start}
+@media(max-width:820px){.two{grid-template-columns:1fr}}
+.card{background:var(--paper);border:.15rem solid var(--line);border-radius:1rem;padding:1rem 1.2rem;min-width:0}
+.note{background:var(--note);border:.12rem solid #e2d36a;border-radius:.6rem;padding:.8rem 1.1rem;font-size:1.25rem;line-height:1.7}
+.note b{background:var(--sun);padding:0 .3em;border-radius:.2em}
+.btn{font-size:1.2rem;font-weight:800;padding:.55rem 1.5rem;border-radius:.9rem;border:0;background:var(--mag);color:#fff;cursor:pointer}
+.btn.alt{background:var(--green)}
+.btn:disabled{opacity:.35;cursor:default}
+.btn:focus-visible,.tab:focus-visible,.opt:focus-visible,.pbtn:focus-visible{outline:.2rem solid var(--blue,#2f5fd0);outline-offset:.15rem}
+.row{display:flex;flex-wrap:wrap;gap:.7rem;align-items:center}
+.atom{display:inline-grid;place-items:center;border-radius:50%;width:var(--s,3.2rem);height:var(--s,3.2rem);font-weight:800;font-size:calc(var(--s,3.2rem)*.42);
+  color:#fff;background:radial-gradient(circle at 35% 30%,color-mix(in srgb,var(--c) 55%,#fff),var(--c) 70%);box-shadow:inset -.2rem -.3rem .5rem rgba(0,0,0,.28)}
+.cluster{display:inline-flex;align-items:center;flex-wrap:wrap;justify-content:center}
+.cluster .atom{margin-inline:-.35rem}
+.rx{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:.8rem 1.2rem}
+.it{text-align:center;background:var(--paper);border-radius:1rem;border:.15rem solid var(--line);padding:.8rem 1.1rem;min-width:10rem;display:grid;gap:.3rem;justify-items:center}
+.it b{font-size:1.3rem}.it span.s{font-size:1.05rem;color:#44574a}
+.op{font-size:2.6rem;color:var(--mag);font-weight:900}
+.prod{transition:opacity .6s,transform .6s}
+.prod.off{opacity:0;transform:scale(.8);pointer-events:none}
+.scene{position:relative;height:min(44vh,24rem);background:var(--paper);border:.15rem solid var(--line);border-radius:1rem;overflow:hidden}
+.scene .atom{position:absolute;transition:all 1.3s ease}
+.scene .d{--s:9rem;left:10%;top:28%;z-index:2}
+.scene .b1{--s:7rem;left:42%;top:3%}
+.scene .b2{--s:7rem;left:42%;top:56%}
+.scene.joined .d{left:60%;top:26%}
+.scene.joined .b1{left:48%;top:26%}
+.scene.joined .b2{left:72%;top:26%}
+.cap{font-size:1.1rem;font-weight:700;text-align:center;margin-top:.4rem}
+.qtext{font-size:1.5rem;font-weight:800;line-height:1.6;margin-bottom:.8rem}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));gap:.8rem}
+.opt{font-size:1.3rem;font-weight:700;padding:.9rem 1rem;border-radius:.9rem;border:.18rem solid var(--green);background:var(--paper);color:var(--ink);cursor:pointer;line-height:1.5}
+.opt.ok{background:#1f8a4c;color:#fff;border-color:#1f8a4c}
+.opt.no{background:#fde2e4;border-color:#c1121f;color:#7a0c14}
+.fb{font-size:1.3rem;font-weight:800;min-height:2.4rem;margin-top:.6rem}
+.fb.good{color:#17703c}.fb.bad{color:#b3121f}
+.foot{display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.dots{display:flex;gap:.45rem;flex-wrap:wrap;justify-content:center}
+.dot{width:.9rem;height:.9rem;border-radius:50%;background:var(--line)}
+.dot.done{background:var(--green)}.dot.on{background:var(--mag);transform:scale(1.35)}
+.big{font-size:3rem;font-family:var(--f-display);color:var(--green-d)}
+.sortcard{font-size:2.4rem;font-weight:800;text-align:center;padding:1.4rem;background:var(--paper);border:.2rem dashed var(--green);border-radius:1.2rem}
+.sortbtns{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.sortbtns .btn{font-size:1.8rem;padding:1rem}
+.shake{animation:sh .4s}@keyframes sh{25%{transform:translateX(.5rem)}75%{transform:translateX(-.5rem)}}
+.bench{display:grid;grid-template-columns:1.5fr 1fr;gap:1.1rem;align-items:start}
+@media(max-width:900px){.bench{grid-template-columns:1fr}}
+.pal{display:flex;flex-wrap:wrap;gap:.6rem}
+.pbtn{background:var(--paper);border:.15rem solid var(--line);border-radius:1rem;padding:.4rem .7rem;cursor:pointer;display:grid;justify-items:center;gap:.1rem;font-size:1rem;font-weight:700;color:var(--ink)}
+.beaker{min-height:10rem;border:.25rem solid #7aa6b8;border-top:none;border-radius:0 0 2rem 2rem;background:linear-gradient(#e9f6fb,#cfe9f3);padding:.6rem;display:flex;flex-wrap:wrap;align-content:flex-end;justify-content:center;gap:.3rem}
+.beaker .atom{--s:2.8rem;margin:0}
+.goal{display:flex;align-items:center;gap:.6rem;font-size:1.15rem;padding:.35rem .6rem;border-radius:.6rem;line-height:1.5}
+.goal.done{background:#d7f2e0;font-weight:800}
+.goal .ck{width:1.4rem;height:1.4rem;border-radius:50%;border:.15rem solid var(--green);flex:none;display:grid;place-items:center;font-size:.9rem;color:#fff}
+.goal.done .ck{background:var(--green)}
+.result{font-size:1.25rem;line-height:1.7;min-height:4rem}
+.warn{background:#ffe3e3;border:.12rem solid #e08a8a;border-radius:.7rem;padding:.5rem .9rem;font-size:1.05rem;font-weight:700;color:#7a1414}
+.stepno{font-weight:800;color:var(--mag);font-size:1.1rem}
+.mgvis{min-height:15rem;display:grid;place-items:center;gap:.6rem;align-content:center}
+.strip{height:1.3rem;border-radius:.7rem;background:linear-gradient(#eceff1,#9aa0a6);box-shadow:0 .1rem .3rem rgba(0,0,0,.3);transition:all .6s}
+.strip.dull{background:linear-gradient(#8a8f94,#5d6368)}
+.flame{width:7rem;height:7rem;border-radius:50%;background:radial-gradient(circle,#fff 25%,#fff7b0 50%,rgba(255,240,120,0) 72%);animation:fl .25s infinite alternate}
+@keyframes fl{from{transform:scale(.9);opacity:.85}to{transform:scale(1.15);opacity:1}}
+.powder{width:9rem;height:3.2rem;border-radius:50% 50% .5rem .5rem/90% 90% .5rem .5rem;background:radial-gradient(circle at 40% 30%,#fff,#dcdcdc)}
+.cmp{width:100%;border-collapse:collapse;font-size:1.15rem}
+.cmp th,.cmp td{border:.1rem solid var(--line);padding:.45rem .6rem;text-align:center}
+.cmp th{background:#e3efe3}
+.salt{width:6rem;height:4rem;border-radius:.8rem;background:radial-gradient(circle at 25% 30%,#fff 0 .35rem,transparent .4rem),radial-gradient(circle at 60% 55%,#fff 0 .4rem,transparent .45rem),radial-gradient(circle at 80% 25%,#fff 0 .3rem,transparent .35rem),#d9dfe6}
+.swatch{width:5rem;height:3.2rem;border-radius:.7rem}
+.final{text-align:center;display:grid;gap:1rem;justify-items:center}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+<header>
+  <h1 class="brand">المركّبات الكيميائية<small>العلوم · الصف الخامس · الدرس 2</small></h1>
+  <nav class="tabs" id="tabs" aria-label="مراحل اللعبة"></nav>
+  <div class="stars" id="stars">النجوم: 0</div>
+</header>
+<main id="stage" aria-live="polite"></main>
+<footer class="foot">
+  <button class="btn alt" id="prev">▶ السابق</button>
+  <div class="dots" id="dots"></div>
+  <button class="btn" id="next">التالي ◀</button>
+</footer>
+<script>
+const $=s=>document.querySelector(s);
+const E={H:{n:'هيدروجين',c:'#8a97a6'},O:{n:'أكسجين',c:'#d0312d'},Na:{n:'صوديوم',c:'#7b4fc9'},Cl:{n:'كلور',c:'#7fae12'},Fe:{n:'حديد',c:'#b5651d'},N:{n:'نيتروجين',c:'#2f5fd0'},Si:{n:'سيليكون',c:'#c9a26b'}};
+const atom=(s,size)=>`<span class="atom" style="--c:${E[s].c};${size?'--s:'+size:''}">${s}</span>`;
+const cluster=cs=>`<span class="cluster">${Object.keys(cs).map(k=>Array(cs[k]).fill(atom(k,'3.4rem')).join('')).join('')}</span>`;
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+let score=0;const got=new Set();
+const award=id=>{if(!got.has(id)){got.add(id);score++;$('#stars').textContent='النجوم: '+score}};
+
+function mcq(host,q,onOk){
+  const order=shuffle(q.o.map((t,i)=>({t,i})));
+  host.innerHTML=`<div class="qtext">${q.q}</div><div class="opts">${order.map(o=>`<button class="opt" data-i="${o.i}">${o.t}</button>`).join('')}</div><div class="fb"></div>`;
+  let first=true,done=false;const fb=host.querySelector('.fb');
+  host.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+    if(done)return;
+    if(+b.dataset.i===q.a){done=true;b.classList.add('ok');fb.className='fb good';fb.textContent='أحسنت! '+(q.w||'');if(first)award(q.id);onOk&&onOk(first)}
+    else{first=false;b.classList.add('no');b.disabled=true;fb.className='fb bad';fb.textContent='حاول مرة أخرى'}
+  });
+}
+
+function rx(left,right,btn){
+  return `<div class="rx">${left.map((l,i)=>(i?'<span class="op">+</span>':'')+`<div class="it">${l.h}<b>${l.n}</b><span class="s">${l.s}</span></div>`).join('')}
+  <span class="op">←</span><div class="it prod off" id="prod">${right.h}<b>${right.n}</b><span class="s">${right.s}</span></div></div>
+  <div class="row" style="justify-content:center"><button class="btn" id="go">${btn}</button></div>`;
+}
+function bindRx(){
+  const go=$('#go');if(!go)return;
+  go.onclick=()=>{$('#prod').classList.remove('off');$('#after').hidden=false;go.disabled=true;award('rx'+cur)};
+}
+
+const SORT=[['الماء H₂O','c'],['الصوديوم Na','e'],['ملح الطعام NaCl','c'],['الكلور Cl','e'],['صدأ الحديد Fe₂O₃','c'],['الأكسجين O','e'],['السيليكا SiO₂','c'],['الهيدروجين H','e'],['نترات الصوديوم NaNO₃','c']];
+let si=0,sfirst=0;
+
+const REC=[
+ {cs:{H:2,O:1},n:'الماء',f:'H<sub>2</sub>O',d:'سائل لا لون له، وتختلف خصائصه عن غازَي الهيدروجين والأكسجين.'},
+ {cs:{Na:1,Cl:1},n:'كلوريد الصوديوم (ملح الطعام)',f:'NaCl',d:'مادة بيضاء اللون نأكلها مع الطعام، بينما الصوديوم صلب فضي والكلور غاز سام.'},
+ {cs:{Fe:2,O:3},n:'أكسيد الحديد (الصدأ)',f:'Fe<sub>2</sub>O<sub>3</sub>',d:'مادة صلبة هشّة بنية اللون، تختلف عن الحديد الصلب القاسي وعن غاز الأكسجين.'},
+ {cs:{Na:1,N:1,O:3},n:'نترات الصوديوم',f:'NaNO<sub>3</sub>',d:'مادة صلبة بيضاء تُستخدم في صناعة الألعاب النارية.'},
+ {cs:{Si:1,O:2},n:'السيليكا',f:'SiO<sub>2</sub>',d:'مادة صلبة تدخل في صناعة الزجاج والسيراميك.'}
+];
+const keyOf=c=>Object.keys(c).filter(k=>c[k]>0).sort().map(k=>k+c[k]).join('');
+REC.forEach(r=>r.k=keyOf(r.cs));
+const found=new Set();let bench={};
+
+const mg={stage:0,i:0,done:[]};
+const MGQ=[
+ {id:'mg3',q:'ما لون شريط المغنيسيوم بعد تنظيفه؟',o:['فضي لامع','أبيض','أحمر','أخضر'],a:0,w:'سجّل ملاحظتك في دفترك.'},
+ null,
+ {id:'mg7',q:'هل المادة الناتجة مركّب أم عنصر؟',o:['مركّب','عنصر'],a:0,w:'ارتبط المغنيسيوم مع الأكسجين فنتج مركّب هو أكسيد المغنيسيوم.'},
+ {id:'mg8',q:'هل تتشابه خواص المادة الناتجة مع خواص المواد المتفاعلة؟',o:['لا، تختلف عنها','نعم، تتشابه تمامًا','تشبه الأكسجين فقط','تشبه المغنيسيوم فقط'],a:0,w:'المركّب له خصائص جديدة تختلف عن عناصره.'}
+];
+const QUIZ=[
+ {id:'z1',q:'المركّب مادة نقية تتكوّن من ارتباط:',o:['عنصرين أو أكثر معًا','ذرّات عنصر واحد فقط','مخلوط من مواد','ماء وملح'],a:0},
+ {id:'z2',q:'ما الصيغة الكيميائية للماء؟',o:['H₂O','NaCl','Fe₂O₃','SiO₂'],a:0},
+ {id:'z3',q:'يتكوّن جزيء الماء من:',o:['ذرّة أكسجين وذرّتين هيدروجين','ذرّتي أكسجين وذرّة هيدروجين','ذرّة صوديوم وذرّة كلور','ذرّة حديد وذرّة أكسجين'],a:0},
+ {id:'z4',q:'ملح الطعام (NaCl) يتكوّن من ارتباط:',o:['الصوديوم مع الكلور','الصوديوم مع الأكسجين','الهيدروجين مع الكلور','الحديد مع الكلور'],a:0},
+ {id:'z5',q:'أي العناصر الآتية غاز سام؟',o:['الكلور','الصوديوم','الحديد','السيليكون'],a:0},
+ {id:'z6',q:'الصدأ Fe₂O₃ مركّب يتكوّن من:',o:['الحديد والأكسجين','الحديد والكلور','الصوديوم والأكسجين','السيليكون والأكسجين'],a:0},
+ {id:'z7',q:'أي المركّبات الآتية يُستخدم في صناعة الألعاب النارية؟',o:['نترات الصوديوم','الماء','السيليكا','الصدأ'],a:0},
+ {id:'z8',q:'السيليكا SiO₂ تدخل في صناعة:',o:['الزجاج والسيراميك','الألعاب النارية','ملح الطعام','الماء'],a:0},
+ {id:'z9',q:'أي المواد الآتية مركّب؟',o:['ملح الطعام','الصوديوم','الكلور','الأكسجين'],a:0}
+];
+let qi=0,qfirst=0;
+const TABS=['شرح','فكّر','مختبر','أسئلة'];
+let cur=0;
+const P=[];
+const add=(tab,render)=>P.push({tab,render});
+
+/* ---------- شرح ---------- */
+add(0,h=>{
+  h.innerHTML=`<h2>مفهوم المركّب</h2>
+  <div class="two"><div style="display:grid;gap:1rem">
+    <p class="txt">ترتبط ذرّات بعض العناصر المختلفة مع بعضها، وينتج عن ذلك مواد جديدة تُسمّى <span class="hl">المركّبات الكيميائية</span>.</p>
+    <div class="row"><button class="btn" id="join">اربط الذرّات</button></div>
+    <p class="txt" id="after" hidden><b>يتكوّن المركّب من ارتباط ذرّات العناصر.</b></p>
+  </div>
+  <div><div class="scene" id="scene">
+    <span class="atom d" style="--c:#3b3f46">A</span><span class="atom b1" style="--c:#3f5fcf">B</span><span class="atom b2" style="--c:#3f5fcf">B</span>
+  </div><div class="cap">الذرّة الداكنة وذرّتان زرقاوان من عنصر آخر</div></div></div>`;
+  const sc=$('#scene'),b=$('#join'),af=$('#after');
+  b.onclick=()=>{const j=sc.classList.toggle('joined');b.textContent=j?'افصل الذرّات':'اربط الذرّات';af.hidden=!j;if(j)award('s0')};
+});
+add(0,h=>{
+  h.innerHTML=`<h2>ما المركّب؟</h2>
+  <div class="two"><div class="card"><p class="txt"><span class="hl">المركّب Compound</span> هو مادة نقية، تتكوّن من ارتباط عنصرين أو أكثر معًا، وتختلف خصائص المركّب عن خصائص العناصر المكوّنة له.</p></div>
+  <div style="display:grid;gap:1rem"><div class="note"><b>الفكرة الرئيسة:</b><br>تتكوّن الكثير من المواد من المركّبات، وتختلف المركّبات في خصائصها عن العناصر المكوّنة منها.</div>
+  <div class="note"><b>المفاهيم والمصطلحات:</b><br>مركّب &nbsp;=&nbsp; Compound</div></div></div>`;
+});
+add(0,h=>{
+  h.innerHTML=`<h2>الماء H<sub>2</sub>O</h2>
+  <p class="txt">يوجد كل من عنصرَي الهيدروجين والأكسجين في الحالة الغازية في الغلاف الجوي.</p>`+
+  rx([{h:cluster({H:2}),n:'هيدروجين',s:'غاز'},{h:atom('O','3.6rem'),n:'أكسجين',s:'غاز'}],{h:cluster({H:2,O:1}),n:'الماء H₂O',s:'سائل'},'اربط الذرّات')+
+  `<div class="note" id="after" hidden>عند ارتباط ذرّة من الأكسجين مع ذرّتين من الهيدروجين ينتج مركّب <b>الماء (H₂O)</b>، ويختلف الماء في خصائصه عن خصائص كل من الهيدروجين والأكسجين.</div>`;
+  bindRx();
+});
+add(0,h=>{
+  h.innerHTML=`<h2>ملح الطعام NaCl</h2>
+  <p class="txt">عنصر الصوديوم صلب لونه فضي، أما عنصر الكلور فهو غاز سام.</p>`+
+  rx([{h:atom('Na','3.6rem'),n:'صوديوم',s:'صلب فضي'},{h:atom('Cl','3.6rem'),n:'كلور',s:'غاز سام'}],{h:'<span class="salt"></span>',n:'كلوريد الصوديوم NaCl',s:'مادة بيضاء اللون'},'اربط الذرّات')+
+  `<div class="note" id="after" hidden>عند ارتباط ذرّة صوديوم مع ذرّة كلور ينتج <b>كلوريد الصوديوم (NaCl)</b> الذي يُسمّى ملح الطعام، وهو مادة بيضاء اللون.</div>`;
+  bindRx();
+});
+add(0,h=>{
+  const C=(sw,f,n,cs,t)=>`<div class="card" style="display:grid;gap:.5rem;justify-items:center;text-align:center"><span class="swatch" style="background:${sw}"></span><div class="big">${f}</div><b style="font-size:1.3rem">${n}</b>${cluster(cs)}<p class="txt" style="font-size:1.1rem">${t}</p></div>`;
+  h.innerHTML=`<h2>أمثلة على مركّبات في حياتنا</h2><div class="opts" style="grid-template-columns:repeat(auto-fit,minmax(17rem,1fr))">`+
+  C('linear-gradient(#b4642a,#7b3a16)','Fe<sub>2</sub>O<sub>3</sub>','أكسيد الحديد (الصدأ)',{Fe:2,O:3},'ذرّتا حديد مع ثلاث ذرّات أكسجين. مادة صلبة هشّة بنية اللون، تختلف عن الحديد الصلب وعن غاز الأكسجين.')+
+  C('#f4f4f4;border:.1rem solid #ccc','NaNO<sub>3</sub>','نترات الصوديوم',{Na:1,N:1,O:3},'ذرّة صوديوم وذرّة نيتروجين وثلاث ذرّات أكسجين. مادة صلبة بيضاء تُستخدم في صناعة الألعاب النارية.')+
+  C('linear-gradient(#e9b39a,#d98c6c)','SiO<sub>2</sub>','السيليكا',{Si:1,O:2},'تتكوّن من السيليكون والأكسجين. مادة صلبة تدخل في صناعة الزجاج والسيراميك.')+`</div>`;
+});
+add(0,h=>{
+  h.innerHTML=`<h2>ملخّص الشرح</h2><div class="card"><ul class="txt" style="margin:0;padding-inline-start:1.5rem;display:grid;gap:.5rem">
+  <li>المركّب مادة نقية تتكوّن من ارتباط عنصرين أو أكثر.</li>
+  <li>خصائص المركّب تختلف عن خصائص عناصره.</li>
+  <li>الماء H₂O: أكسجين + هيدروجين.</li>
+  <li>ملح الطعام NaCl: صوديوم + كلور.</li>
+  <li>من أمثلة المركّبات: الصدأ Fe₂O₃، نترات الصوديوم NaNO₃، السيليكا SiO₂.</li></ul></div>
+  <p class="txt"><b>جاهزون؟ انتقلوا إلى مرحلة «فكّر».</b></p>`;
+});
+
+/* ---------- فكّر ---------- */
+add(1,h=>{h.innerHTML=`<h2>أتحقّق (1)</h2><div class="card" id="q"></div>`;
+  mcq($('#q'),{id:'t1',q:'ماذا تُسمّى المواد الناتجة من ارتباط ذرّات العناصر بعضها ببعض؟',o:['مركّبات','عناصر','مخاليط','فلزات'],a:0,w:'تُسمّى المركّبات الكيميائية.'})});
+add(1,h=>{h.innerHTML=`<h2>أتحقّق (2)</h2><div class="card" id="q"></div>`;
+  mcq($('#q'),{id:'t2',q:'كيف يختلف ملح الطعام عن عنصر الصوديوم؟',o:['ملح الطعام مادة بيضاء، والصوديوم صلب فضي','لا يختلفان أبدًا','ملح الطعام غاز سام','الصوديوم مادة بيضاء ويُستخدم في الطعام'],a:0,w:'خصائص المركّب تختلف عن خصائص عناصره.'})});
+add(1,h=>{
+  function draw(){
+    if(si>=SORT.length){h.innerHTML=`<div class="final"><h2>أنهيتم التصنيف!</h2><p class="txt">أجبتم عن <span class="hl">${sfirst} من ${SORT.length}</span> من المحاولة الأولى.</p><button class="btn" id="again">أعيدوا اللعب</button></div>`;
+      $('#again').onclick=()=>{si=0;sfirst=0;draw()};return}
+    const c=SORT[si];
+    h.innerHTML=`<h2>فكّر: عنصر أم مركّب؟ <small style="font-size:.6em;color:var(--mag)">(${si+1} / ${SORT.length})</small></h2>
+    <div class="sortcard" id="sc">${c[0]}</div>
+    <div class="sortbtns"><button class="btn alt" data-t="e">عنصر</button><button class="btn" data-t="c">مركّب</button></div>
+    <div class="fb" id="fb"></div>`;
+    let first=true,lock=false;
+    h.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{
+      if(lock)return;const fb=$('#fb');
+      if(b.dataset.t===c[1]){lock=true;fb.className='fb good';fb.textContent=c[1]==='c'?'صحيح! مركّب: يتكوّن من أكثر من عنصر.':'صحيح! عنصر: نوع واحد من الذرّات.';if(first){sfirst++;award('s'+si)}setTimeout(()=>{si++;draw()},1300)}
+      else{first=false;fb.className='fb bad';fb.textContent='فكّر: هل تتكوّن المادة من نوع واحد من الذرّات أم من عنصرين أو أكثر؟';$('#sc').classList.remove('shake');void $('#sc').offsetWidth;$('#sc').classList.add('shake')}
+    });
+  }
+  draw();
+});
+
+/* ---------- مختبر ---------- */
+add(2,h=>{
+  const kinds=Object.keys(E);
+  h.innerHTML=`<h2>مختبر المركّبات: ابنِ مركّبًا</h2>
+  <div class="bench"><div style="display:grid;gap:.8rem">
+    <div class="txt" style="font-size:1.15rem">اضغط على الذرّات لتضعها في الكأس، ثم اضغط «تفاعل».</div>
+    <div class="pal">${kinds.map(k=>`<button class="pbtn" data-a="${k}">${atom(k,'2.6rem')}<span>${E[k].n}</span></button>`).join('')}</div>
+    <div class="beaker" id="beaker"></div>
+    <div class="row"><button class="btn" id="react">تفاعل</button><button class="btn alt" id="clear">تفريغ الكأس</button></div>
+    <div class="result card" id="res">النتيجة تظهر هنا.</div>
+  </div><div class="card"><b style="font-size:1.2rem">مهمّات المختبر</b><div id="goals" style="display:grid;gap:.3rem;margin-top:.4rem"></div></div></div>`;
+  const draw=()=>{
+    $('#beaker').innerHTML=Object.keys(bench).filter(k=>bench[k]>0).map(k=>Array(bench[k]).fill(atom(k)).join('')).join('');
+    $('#goals').innerHTML=REC.map(r=>`<div class="goal${found.has(r.k)?' done':''}"><span class="ck">${found.has(r.k)?'✓':''}</span><span>${r.n} <b dir="ltr">${r.f}</b></span></div>`).join('');
+  };
+  h.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{const k=b.dataset.a;bench[k]=(bench[k]||0)+1;if(Object.values(bench).reduce((a,b)=>a+b,0)>14){bench[k]--}draw()});
+  $('#clear').onclick=()=>{bench={};$('#res').textContent='النتيجة تظهر هنا.';draw()};
+  $('#react').onclick=()=>{
+    const res=$('#res'),kinds=Object.keys(bench).filter(k=>bench[k]>0),r=REC.find(x=>x.k===keyOf(bench));
+    if(r){found.add(r.k);award('lab'+r.k);res.innerHTML=`<div style="text-align:center">${cluster(r.cs)}</div><b>تكوّن مركّب: ${r.n} <span dir="ltr">${r.f}</span></b><br>${r.d}`;draw();
+      if(found.size===REC.length)res.innerHTML+=`<br><b style="color:var(--mag)">أنجزتم كل المهمّات. ممتاز!</b>`}
+    else if(!kinds.length)res.textContent='ضع ذرّات في الكأس أولًا.';
+    else if(kinds.length===1)res.textContent='في الكأس ذرّات عنصر واحد فقط، فلم يتكوّن مركّب. أضف ذرّات عنصر آخر.';
+    else res.textContent='لم يتكوّن مركّب من مركّبات الدرس بهذه الأعداد. غيّر عدد الذرّات وجرّب مرة أخرى.';
+  };
+  draw();
+});
+add(2,h=>{
+  const T=[
+   {v:'اقطع',t:'شريطًا من المغنيسيوم طوله 10 cm.',act:'قصّ الشريط',st:1},
+   {v:'استخدم',t:'ورق صنفرة لتنظيف شريط المغنيسيوم.',act:'نظّف الشريط',st:2},
+   {v:'لاحظ',t:'لون الشريط، وسجّل ملاحظاتك.'},
+   {v:'جرّب',t:'أشعل الشريط في الهواء فوق طبق بتري باستخدام موقد بنسن.',act:'أشعل الشريط',st:3},
+   {v:'صف',t:'المادة الناتجة عن إشعال الشريط.',act:'اعرض المادة الناتجة',st:4},
+   {v:'قارن',t:'بين شريط المغنيسيوم والمادة الناتجة.',act:'اعرض المقارنة',cmp:1},
+   {v:'تنبّأ',t:'هل المادة الناتجة مركّب أم عنصر؟',q:2},
+   {v:'استنتج',t:'هل تتشابه خواص المادة الناتجة مع خواص المواد المتفاعلة؟',q:3}
+  ];
+  const vis=()=>{
+    const s=mg.stage;
+    if(s===0)return `<div class="strip dull" style="width:min(80%,22rem)"></div><div class="cap">شريط مغنيسيوم (طويل)</div>`;
+    if(s===1)return `<div class="strip dull" style="width:12rem"></div><div class="cap">طول الشريط 10 cm</div>`;
+    if(s===2)return `<div class="strip" style="width:12rem"></div><div class="cap">شريط لامع بعد التنظيف</div>`;
+    if(s===3)return `<div class="flame"></div><div class="strip" style="width:8rem"></div><div class="cap">لهب ساطع (تحت إشراف المعلمة)</div>`;
+    return `<div class="row" style="gap:2rem;justify-content:center"><div><div class="strip" style="width:8rem"></div><div class="cap">قبل: شريط</div></div><div><div class="powder"></div><div class="cap">بعد: مسحوق</div></div></div>`;
+  };
+  function draw(){
+    const s=T[mg.i];
+    h.innerHTML=`<h2>نشاط: العنصر والمركّب</h2><div class="warn">يُنفَّذ هذا النشاط بإشراف المعلمة، ولا ننظر مباشرة إلى لهب المغنيسيوم.</div>
+    <div class="two"><div class="card" style="display:grid;gap:.9rem"><div class="stepno">الخطوة ${mg.i+1} من ${T.length}</div>
+      <p class="txt"><b style="color:var(--mag)">${s.v}</b> ${s.t}</p><div id="act"></div>
+      <div class="row"><button class="btn alt" id="mp" ${mg.i?'':'disabled'}>السابقة</button><button class="btn" id="mn" ${mg.done[mg.i]?'':'disabled'}>${mg.i===T.length-1?'انتهى':'الخطوة التالية'}</button></div></div>
+      <div class="card mgvis" id="vis">${vis()}</div></div>`;
+    const act=$('#act'),fin=()=>{mg.done[mg.i]=true;$('#mn').disabled=mg.i===T.length-1};
+    if(s.q!==undefined||mg.i===2){const q=mg.i===2?MGQ[0]:MGQ[s.q];mg.done[mg.i]?act.innerHTML='<div class="fb good">أحسنت! تمّت الإجابة.</div>':mcq(act,q,()=>{mg.done[mg.i]=true;$('#mn').disabled=false;if(mg.i===T.length-1)$('#mn').disabled=true})}
+    else if(s.cmp){act.innerHTML=`<button class="btn" id="a">${s.act}</button><div id="cmp"></div>`;
+      const show=()=>{$('#cmp').innerHTML=`<table class="cmp"><tr><th>الخاصية</th><th>شريط المغنيسيوم</th><th>المادة الناتجة</th></tr><tr><td>اللون</td><td>فضي لامع</td><td>أبيض</td></tr><tr><td>الشكل</td><td>شريط صلب</td><td>مسحوق هش</td></tr><tr><td>الاشتعال</td><td>يشتعل بلهب ساطع</td><td>لا يشتعل</td></tr></table>`;$('#a').disabled=true};
+      mg.done[mg.i]?show():$('#a').onclick=()=>{show();fin();$('#mn').disabled=false};if(mg.done[mg.i])show()}
+    else{act.innerHTML=`<button class="btn" id="a" ${mg.done[mg.i]?'disabled':''}>${s.act}</button>`;
+      $('#a').onclick=()=>{mg.stage=s.st;mg.done[mg.i]=true;$('#a').disabled=true;$('#vis').innerHTML=vis();$('#mn').disabled=false;
+        if(mg.i===4)$('#act').insertAdjacentHTML('beforeend','<p class="txt" style="margin-top:.6rem">مسحوق أبيض هو <b>أكسيد المغنيسيوم</b>.</p>')}}
+    if(mg.i===4&&mg.done[4])$('#act').insertAdjacentHTML('beforeend','<p class="txt" style="margin-top:.6rem">مسحوق أبيض هو <b>أكسيد المغنيسيوم</b>.</p>');
+    $('#mp').onclick=()=>{mg.i--;draw()};
+    $('#mn').onclick=()=>{if(mg.i<T.length-1){mg.i++;draw()}};
+  }
+  draw();
+});
+
+/* ---------- أسئلة ---------- */
+add(3,h=>{
+  function draw(){
+    if(qi>=QUIZ.length){
+      const s=qfirst,msg=s>=8?'عالم كيمياء ماهر!':s>=6?'عمل جميل، واصلوا!':'راجعوا الشرح وحاولوا مرة أخرى.';
+      h.innerHTML=`<div class="final"><h2>انتهت الأسئلة</h2><div class="big">${s} / ${QUIZ.length}</div><p class="txt">${msg}</p><button class="btn" id="re">ابدؤوا من جديد</button></div>`;
+      $('#re').onclick=()=>{qi=0;qfirst=0;draw()};return}
+    h.innerHTML=`<h2>سؤال ${qi+1} من ${QUIZ.length}</h2><div class="card" id="q"></div><div class="row"><button class="btn" id="nq" disabled>${qi===QUIZ.length-1?'النتيجة':'السؤال التالي'}</button></div>`;
+    mcq($('#q'),QUIZ[qi],first=>{if(first)qfirst++;$('#nq').disabled=false});
+    $('#nq').onclick=()=>{qi++;draw()};
+  }
+  draw();
+});
+
+/* ---------- التنقل ---------- */
+function go(i){
+  cur=Math.max(0,Math.min(P.length-1,i));
+  P[cur].render($('#stage'));
+  $('#stage').scrollTop=0;
+  const t=P[cur].tab;
+  $('#tabs').innerHTML=TABS.map((n,k)=>`<button class="tab" data-t="${k}" ${k===t?'aria-current="true"':''}>${n}</button>`).join('');
+  $('#tabs').querySelectorAll('.tab').forEach(b=>b.onclick=()=>go(P.findIndex(p=>p.tab===+b.dataset.t)));
+  const idx=P.map((p,k)=>k).filter(k=>P[k].tab===t);
+  $('#dots').innerHTML=idx.map(k=>`<span class="dot${k===cur?' on':k<cur?' done':''}"></span>`).join('');
+  $('#prev').disabled=cur===0;$('#next').disabled=cur===P.length-1;
+}
+$('#prev').onclick=()=>go(cur-1);
+$('#next').onclick=()=>go(cur+1);
+go(0);
+</script>
+
+</body></html>
